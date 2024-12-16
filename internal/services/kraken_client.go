@@ -1,8 +1,6 @@
 package services
 
 import (
-	"log"
-
 	"github.com/gorilla/websocket"
 )
 
@@ -35,15 +33,8 @@ func (k *KrakenClient) SubscribeToTicker(symbol string) error {
 	return k.Conn.WriteJSON(message)
 }
 
-// ReadMessages implementation for Kraken
-func (k *KrakenClient) ReadMessages() {
-	defer k.Conn.Close()
-	for {
-		_, message, err := k.Conn.ReadMessage()
-		if err != nil {
-			log.Printf("Error reading message from Kraken: %v", err)
-			break
-		}
-		log.Printf("Kraken message: %s", message)
-	}
+// ReadMessage ReadMessages implementation for Kraken
+func (k *KrakenClient) ReadMessage() ([]byte, error) {
+	_, message, err := k.Conn.ReadMessage()
+	return message, err
 }

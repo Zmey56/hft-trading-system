@@ -10,6 +10,7 @@ func main() {
 	const (
 		binanceWSURL = "wss://stream.binance.com:9443/ws"
 		krakenWSURL  = "wss://ws.kraken.com"
+		threshold    = 10.0 // Setting the minimum difference for arbitration
 	)
 
 	// Connect Binance
@@ -25,11 +26,16 @@ func main() {
 	}
 
 	// Creating a service with both clients
-	marketDataService := services.NewMarketDataService(binanceClient, krakenClient)
+	// marketDataService := services.NewMarketDataService(binanceClient, krakenClient)
+
+	// Creating and launching an arbitration service
+	arbitrageService := services.NewArbitrageService(binanceClient, krakenClient, threshold)
+	symbol := "btcusdt"
+	arbitrageService.Start(symbol)
 
 	// Subscribe to the tickers and start processing
-	symbol := "btcusdt"
-	marketDataService.Start(symbol)
+	// symbol := "btcusdt"
+	// marketDataService.Start(symbol)
 
 	select {}
 }

@@ -1,8 +1,6 @@
 package services
 
 import (
-	"log"
-
 	"github.com/gorilla/websocket"
 )
 
@@ -29,15 +27,8 @@ func (b *BinanceClient) SubscribeToTicker(symbol string) error {
 	return b.Conn.WriteJSON(message)
 }
 
-// ReadMessages implementation for Binance
-func (b *BinanceClient) ReadMessages() {
-	defer b.Conn.Close()
-	for {
-		_, message, err := b.Conn.ReadMessage()
-		if err != nil {
-			log.Printf("Error reading message from Binance: %v", err)
-			break
-		}
-		log.Printf("Binance message: %s", message)
-	}
+// ReadMessage ReadMessages implementation for Binance
+func (b *BinanceClient) ReadMessage() ([]byte, error) {
+	_, message, err := b.Conn.ReadMessage()
+	return message, err
 }
