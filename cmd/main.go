@@ -7,35 +7,32 @@ import (
 )
 
 func main() {
-	const (
-		binanceWSURL = "wss://stream.binance.com:9443/ws"
-		krakenWSURL  = "wss://ws.kraken.com"
-		threshold    = 10.0 // Setting the minimum difference for arbitration
-	)
+	const krakenWSURL = "wss://ws.kraken.com"
+	const binanceWSURL = "wss://stream.binance.com:9443/ws"
 
-	// Connect Binance
-	binanceClient, err := services.NewBinanceClient(binanceWSURL)
-	if err != nil {
-		log.Fatalf("Failed to connect to Binance: %v", err)
-	}
-
-	// Connect Kraken
+	// Подключаем Kraken
 	krakenClient, err := services.NewKrakenClient(krakenWSURL)
 	if err != nil {
 		log.Fatalf("Failed to connect to Kraken: %v", err)
 	}
 
-	// Creating a service with both clients
-	// marketDataService := services.NewMarketDataService(binanceClient, krakenClient)
+	// Подключаем Binance
+	binanceClient, err := services.NewBinanceClient(binanceWSURL)
+	if err != nil {
+		log.Fatalf("Failed to connect to Binance: %v", err)
+	}
 
-	// Creating and launching an arbitration service
-	arbitrageService := services.NewArbitrageService(binanceClient, krakenClient, threshold)
+	// Подписываемся на тикеры
 	symbol := "btcusdt"
+
+	if err := krakenClient.SubscribeToTicker(symbol); err != nil {
+		log.Fatalf("Failed to subscribe to Kraken ticker: %v", err)
+	}
+	if err := binanceClient.SubscribeToTicker(symbol); err != nil {
+		log.Fatalf("Failed to subscribe to Binance ticker: %v", err)
+	}
+
+	// Создаём и запускаем сервис арбитража
+	arbitrageService := services.NewArbitrageService(binanceClient, krakenClient)
 	arbitrageService.Start(symbol)
-
-	// Subscribe to the tickers and start processing
-	// symbol := "btcusdt"
-	// marketDataService.Start(symbol)
-
-	select {}
 }
