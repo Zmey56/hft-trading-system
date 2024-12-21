@@ -86,20 +86,20 @@ func (a *ArbitrageService) readPrices(client ExchangeClient, priceChan chan floa
 			break
 		}
 
-		log.Printf("[%s] Raw Message: %s", exchange, message)
+		// log.Printf("[%s] Raw Message: %s", exchange, message)
 
 		switch exchange {
 		case "Binance":
 			// Шаг 1: Логирование полученного сообщения
-			log.Printf("[Binance] Received Raw Message: %s", message)
+			// log.Printf("[Binance] Received Raw Message: %s", message)
 
 			// Шаг 2: Попытка распознать сообщение как подтверждение подписки
 			var response BinanceResponse
 			if err := json.Unmarshal(message, &response); err == nil && response.ID == 1 {
-				log.Println("[Binance] Subscription confirmed")
+				// log.Println("[Binance] Subscription confirmed")
 				continue
 			}
-			log.Println("[Binance] Message is not a subscription confirmation")
+			// log.Println("[Binance] Message is not a subscription confirmation")
 
 			// Шаг 3: Попытка распарсить сообщение в карту (map)
 			var raw map[string]interface{}
@@ -107,10 +107,10 @@ func (a *ArbitrageService) readPrices(client ExchangeClient, priceChan chan floa
 				log.Printf("[Binance] Failed to parse message as map: %v", err)
 				continue
 			}
-			log.Println("[Binance] Message successfully parsed as map")
+			// log.Println("[Binance] Message successfully parsed as map")
 
 			// Шаг 4: Проверка наличия ключей "b" (bid) и "a" (ask)
-			log.Printf("[Binance] Checking keys 'b' and 'a' in the message")
+			// log.Printf("[Binance] Checking keys 'b' and 'a' in the message")
 			bidStr, bidOk := raw["b"].(string)
 			askStr, askOk := raw["a"].(string)
 
@@ -118,7 +118,7 @@ func (a *ArbitrageService) readPrices(client ExchangeClient, priceChan chan floa
 				log.Printf("[Binance] Missing Bid or Ask in message: %s", message)
 				continue
 			}
-			log.Printf("[Binance] Found keys 'b' and 'a': bid=%s, ask=%s", bidStr, askStr)
+			// log.Printf("[Binance] Found keys 'b' and 'a': bid=%s, ask=%s", bidStr, askStr)
 
 			// Шаг 5: Попытка преобразовать строки в числа
 			bid := parsePrice(bidStr)
@@ -127,15 +127,15 @@ func (a *ArbitrageService) readPrices(client ExchangeClient, priceChan chan floa
 				log.Printf("[Binance] Failed to parse Bid or Ask as float: bid=%s, ask=%s", bidStr, askStr)
 				continue
 			}
-			log.Printf("[Binance] Successfully parsed prices: bid=%.2f, ask=%.2f", bid, ask)
+			// log.Printf("[Binance] Successfully parsed prices: bid=%.2f, ask=%.2f", bid, ask)
 
 			// Шаг 6: Расчёт средней цены
 			averagePrice := (bid + ask) / 2
-			log.Printf("[Binance] Calculated Average Price: %.2f", averagePrice)
+			// log.Printf("[Binance] Calculated Average Price: %.2f", averagePrice)
 
 			// Шаг 7: Отправка средней цены в канал
 			priceChan <- averagePrice
-			log.Println("[Binance] Average Price sent to channel")
+			// log.Println("[Binance] Average Price sent to channel")
 
 		case "Kraken":
 			// Проверяем, является ли сообщение системным

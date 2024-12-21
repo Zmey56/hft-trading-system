@@ -41,6 +41,6 @@ func (b *BinanceClient) ReadMessage() ([]byte, error) {
 		log.Printf("[Binance] Error reading message: %v", err)
 		return nil, err
 	}
-	log.Printf("[Binance] Raw Message: %s", message)
+	// log.Printf("[Binance] Raw Message: %s", message)
 	return message, nil
 }
